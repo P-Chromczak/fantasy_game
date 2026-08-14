@@ -5,6 +5,8 @@ import '../widgets/auth/auth_glass_card.dart';
 import '../widgets/auth/auth_form_field.dart';
 import '../widgets/auth/auth_button.dart';
 import '../widgets/auth/oauth_login_button.dart';
+import '../api/api_client.dart';
+import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,10 +16,12 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _authService = AuthService(
+    apiClient: ApiClient(baseUrl: 'http://testtesttest'),
+  );
 
   @override
   void dispose() {
@@ -52,8 +56,10 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    print('Name: ${_nameController.text.trim()}');
-    print('Password: ${_passwordController.text}');
+    await _authService.login(
+      name: _nameController.text.trim(),
+      password: _passwordController.text,
+    );
   }
 
   @override
@@ -102,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     AuthButton(
                       buttonText: "Log in",
-                      onPressed: login,
+                       onPressed: login
                     ),
 
                     const SizedBox(height: 30),
