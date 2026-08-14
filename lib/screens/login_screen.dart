@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/auth/auth_background.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,7 +12,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(),
+      body: const AuthBackground(),
     );
   }
 }
