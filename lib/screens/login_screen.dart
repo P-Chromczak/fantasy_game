@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../widgets/auth/auth_background.dart';
 import '../widgets/auth/auth_glass_card.dart';
+import '../widgets/auth/auth_form_field.dart';
+import '../widgets/auth/auth_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -31,6 +33,27 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: Color.fromARGB(255, 207, 207, 207),
                     ),
                   ),
+
+                const SizedBox(height: 15),
+
+                AuthFormField(
+                  labelText: "Name",
+                  hintText: "Enter your name",
+                ),
+
+                AuthFormField(
+                  obscureText: true,
+                  labelText: "Password",
+                  hintText: "Enter your Password",
+                ),
+
+                const SizedBox(height: 10),
+
+                AuthButton(
+                  buttonText: "Log in",
+                  onPressed: () {},
+                ),
+
                 ],
               ),
             ),
