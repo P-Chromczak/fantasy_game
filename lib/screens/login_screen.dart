@@ -4,6 +4,7 @@ import '../widgets/auth/auth_background.dart';
 import '../widgets/auth/auth_glass_card.dart';
 import '../widgets/auth/auth_form_field.dart';
 import '../widgets/auth/auth_button.dart';
+import '../widgets/auth/oauth_login_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -52,6 +53,34 @@ class _LoginScreenState extends State<LoginScreen> {
                 AuthButton(
                   buttonText: "Log in",
                   onPressed: () {},
+                ),
+
+                const SizedBox(height: 30),
+
+                OAuthLoginButton(
+                  buttonText: "Log in with Google",
+                  buttonImage: "assets/images/google.svg",
+                ),
+
+                const SizedBox(height: 5),
+
+                OAuthLoginButton(
+                  buttonText: "Log in with Discord",
+                  buttonImage: "assets/images/discord.svg",
+                ),
+
+                const SizedBox(height: 5),
+
+                OAuthLoginButton(
+                  buttonText: "Log in with Apple",
+                  buttonImage: "assets/images/apple.svg",
+                ),
+
+                const SizedBox(height: 5),
+
+                OAuthLoginButton(
+                  buttonText: "Log in with Facebook",
+                  buttonImage: "assets/images/facebook.svg",
                 ),
 
                 ],
