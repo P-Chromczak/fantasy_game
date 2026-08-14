@@ -83,6 +83,27 @@ class _LoginScreenState extends State<LoginScreen> {
                   buttonImage: "assets/images/facebook.svg",
                 ),
 
+                const SizedBox(height: 20),
+
+                const Text(
+                  "Don't have an account?",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Color.fromARGB(255, 207, 207, 207),
+                  ),
+                ),
+
+                InkWell(
+                  onTap: () {},
+                  child: const Text(
+                    "Sign up",
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Color(0xFFFDE68A),
+                    ),
+                  ),
+                ),
+
                 ],
               ),
             ),
