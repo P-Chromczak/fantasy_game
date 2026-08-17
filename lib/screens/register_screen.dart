@@ -66,7 +66,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          
+
           const AuthBackground(),
 
           AuthSafeArea(
@@ -76,6 +76,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    
                     const Text(
                       "Create Your Account",
                       style: TextStyle(

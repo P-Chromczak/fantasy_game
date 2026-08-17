@@ -22,4 +22,22 @@ class AuthService {
     print('Status: ${response.statusCode}');
     print('Response: ${response.body}');
   }
+
+  Future<void> register({
+    required String email,
+    required String password,
+  }) async {
+    final response = await apiClient.post(
+      '/api/users/register',
+      body: {
+        'email': email,
+        'password': password,
+      },
+    );
+
+    print('Status: ${response.statusCode}');
+    print('Response: ${response.body}');
+  }
 }
+
+  
