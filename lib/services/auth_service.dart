@@ -8,13 +8,13 @@ class AuthService {
   });
 
   Future<void> login({
-    required String name,
+    required String username,
     required String password,
   }) async {
     final response = await apiClient.post(
-      '/auth/login',
+      '/api/token/pair',
       body: {
-        'name': name,
+        'username': username,
         'password': password,
       },
     );

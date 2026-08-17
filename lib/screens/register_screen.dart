@@ -5,6 +5,8 @@ import '../widgets/auth/auth_background.dart';
 import '../widgets/auth/auth_glass_card.dart';
 import '../widgets/auth/auth_form_field.dart';
 import '../widgets/auth/auth_button.dart';
+import '../api/api_client.dart';
+import '../services/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -18,6 +20,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _authService = AuthService(
+    apiClient: ApiClient(
+      baseUrl: 'http://testtesttest',
+    ),
+  );
 
   @override
   void dispose() {
@@ -56,9 +63,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // Backend podłączymy później.
-    print('Email: ${_emailController.text.trim()}');
-    print('Password: ${_passwordController.text}');
+    await _authService.register(
+    email: _emailController.text.trim(),
+    password: _passwordController.text,
+    );
   }
 
   @override
@@ -76,7 +84,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    
+
                     const Text(
                       "Create Your Account",
                       style: TextStyle(
@@ -107,7 +115,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     const SizedBox(height: 10),
 
-                    AuthButton(buttonText: "Sign up", onPressed: register),
+                    AuthButton(
+                      buttonText: "Sign up",
+                       onPressed: register,
+                       ),
 
                     const SizedBox(height: 20),
 

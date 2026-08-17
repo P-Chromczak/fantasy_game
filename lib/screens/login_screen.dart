@@ -19,7 +19,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _authService = AuthService(
     apiClient: ApiClient(baseUrl: 'http://testtesttest'),
@@ -27,15 +27,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
 
     super.dispose();
   }
 
-  String? validateName(String? value) {
+  String? validateUsername(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return "Name is required";
+      return "Username is required";
     }
 
     return null;
@@ -59,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     await _authService.login(
-      name: _nameController.text.trim(),
+      username: _usernameController.text.trim(),
       password: _passwordController.text,
     );
   }
@@ -92,10 +92,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 15),
 
                     AuthFormField(
-                      controller: _nameController,
-                      validator: validateName,
-                      labelText: "Name",
-                      hintText: "Enter your name",
+                      controller: _usernameController,
+                      validator: validateUsername,
+                      labelText: "Username",
+                      hintText: "Enter your username",
                     ),
 
                     const SizedBox(height: 10),
@@ -105,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       validator: validatePassword,
                       obscureText: true,
                       labelText: "Password",
-                      hintText: "Enter your Password",
+                      hintText: "Enter your password",
                     ),
 
                     const SizedBox(height: 10),
