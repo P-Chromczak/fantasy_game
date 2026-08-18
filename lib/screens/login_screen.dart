@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../exceptions/network_exception.dart';
 import '../widgets/auth/auth_background.dart';
 import '../widgets/auth/auth_glass_card.dart';
 import '../widgets/auth/auth_form_field.dart';
@@ -54,15 +55,25 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> login() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+  if (!_formKey.currentState!.validate()) {
+    return;
+  }
 
+  try {
     await _authService.login(
       username: _usernameController.text.trim(),
       password: _passwordController.text,
     );
+  } on NetworkException catch (error) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error.message),
+      ),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {
