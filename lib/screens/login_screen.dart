@@ -10,6 +10,7 @@ import '../widgets/auth/auth_safearea.dart';
 import '../api/api_client.dart';
 import '../services/auth_service.dart';
 import 'register_screen.dart';
+import '../services/token_storage_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,7 +24,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _authService = AuthService(
-    apiClient: ApiClient(baseUrl: 'http://testtesttest'),
+    apiClient: ApiClient(baseUrl: 'http://testtesttest'), //Placeholder 
+    tokenStorage: createTokenStorage(),
   );
 
   @override
