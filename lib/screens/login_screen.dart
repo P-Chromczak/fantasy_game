@@ -23,9 +23,13 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _authService = AuthService(
-    apiClient: ApiClient(baseUrl: 'http://testtesttest'), //Placeholder 
-    tokenStorage: createTokenStorage(),
+  late final _tokenStorage = createTokenStorage();
+  late final _authService = AuthService(
+    apiClient: ApiClient(
+      baseUrl: 'http://testtesttest', //Placeholder
+      tokenStorage: _tokenStorage,
+    ),
+    tokenStorage: _tokenStorage,
   );
 
   @override
@@ -57,32 +61,29 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> login() async {
-  if (!_formKey.currentState!.validate()) {
-    return;
-  }
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
-  try {
-    await _authService.login(
-      username: _usernameController.text.trim(),
-      password: _passwordController.text,
-    );
-  } on NetworkException catch (error) {
-    if (!mounted) return;
+    try {
+      await _authService.login(
+        username: _usernameController.text.trim(),
+        password: _passwordController.text,
+      );
+    } on NetworkException catch (error) {
+      if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(error.message),
-      ),
-    );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error.message)));
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          
           const AuthBackground(),
 
           AuthSafeArea(
@@ -92,7 +93,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-
                     const Text(
                       "Welcome Back, Hero",
                       style: TextStyle(
@@ -125,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     AuthButton(
                       buttonText: "Log in",
-                      onPressed: login,
+                      onPressed: login
                     ),
 
                     const SizedBox(height: 30),

@@ -7,10 +7,7 @@ class AuthService {
   final ApiClient apiClient;
   final TokenStorage tokenStorage;
 
-  AuthService({
-    required this.apiClient,
-    required this.tokenStorage,
-  });
+  AuthService({required this.apiClient, required this.tokenStorage});
 
   Future<void> login({
     required String username,
@@ -18,10 +15,7 @@ class AuthService {
   }) async {
     final response = await apiClient.post(
       '/api/token/pair',
-      body: {
-        'username': username,
-        'password': password,
-      },
+      body: {'username': username, 'password': password},
     );
 
     if (response.statusCode != 200) {
@@ -36,17 +30,13 @@ class AuthService {
     );
   }
 
-    //This Will Change
   Future<void> register({
     required String email,
     required String password,
   }) async {
     final response = await apiClient.post(
       '/api/users/register',
-      body: {
-        'email': email,
-        'password': password,
-      },
+      body: {'email': email, 'password': password},
     );
 
     if (response.statusCode != 201) {
@@ -64,6 +54,37 @@ class AuthService {
   Future<void> logout() async {
     await tokenStorage.clearTokens();
   }
-}
 
-  
+  Future<void> refreshAccessToken() async {
+    final refreshToken = await tokenStorage.getRefreshToken();
+
+    if (refreshToken == null) {
+      throw Exception('No refresh token available.');
+    }
+
+    final response = await apiClient.post(
+      '/api/token/refresh',
+      body: {'refresh': refreshToken},
+    );
+
+    if (response.statusCode != 200) {
+      await tokenStorage.clearTokens();
+
+      throw Exception('Session expired. Please log in again.');
+    }
+
+    final data = jsonDecode(response.body);
+
+    final newAccessToken = data['access'];
+    final newRefreshToken = data['refresh'];
+
+    if (newAccessToken == null || newRefreshToken == null) {
+      throw Exception('Server did not return valid tokens.');
+    }
+
+    await tokenStorage.saveTokens(
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+    );
+  }
+}

@@ -7,6 +7,7 @@ import '../widgets/auth/auth_form_field.dart';
 import '../widgets/auth/auth_button.dart';
 import '../api/api_client.dart';
 import '../services/auth_service.dart';
+import '../services/token_storage_provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -20,10 +21,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _authService = AuthService(
+  late final _tokenStorage = createTokenStorage();
+  late final _authService = AuthService(
     apiClient: ApiClient(
-      baseUrl: 'http://testtesttest',
+      baseUrl: 'http://testtesttest', //Placeholder
+      tokenStorage: _tokenStorage,
     ),
+    tokenStorage: _tokenStorage,
   );
 
   @override
