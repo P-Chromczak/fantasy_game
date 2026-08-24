@@ -40,3 +40,7 @@ class TokenStorageMobile implements TokenStorage {
     await _storage.delete(key: _refreshTokenKey);
   }
 }
+
+TokenStorage createTokenStorage() {
+  return TokenStorageMobile();
+}

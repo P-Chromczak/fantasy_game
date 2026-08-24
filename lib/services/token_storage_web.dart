@@ -50,3 +50,7 @@ class TokenStorageWeb implements TokenStorage {
     );
   }
 }
+
+TokenStorage createTokenStorage() {
+  return TokenStorageWeb();
+}
