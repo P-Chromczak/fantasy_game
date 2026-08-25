@@ -5,18 +5,30 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 import '../exceptions/network_exception.dart';
+import '../services/token_refresh_service.dart';
 import '../services/token_storage.dart';
 
 class ApiClient {
   final String baseUrl;
   final TokenStorage tokenStorage;
+  final TokenRefreshService tokenRefreshService;
 
-  ApiClient({required this.baseUrl, required this.tokenStorage});
+  Future<bool>? _refreshFuture;
+
+  ApiClient({
+    required this.baseUrl,
+    required this.tokenStorage,
+  }) : tokenRefreshService = TokenRefreshService(
+          baseUrl: baseUrl,
+          tokenStorage: tokenStorage,
+        );
 
   Future<Map<String, String>> _buildHeaders({
     bool authenticated = false,
   }) async {
-    final headers = <String, String>{'Content-Type': 'application/json'};
+    final headers = <String, String>{
+      'Content-Type': 'application/json',
+    };
 
     if (authenticated) {
       final accessToken = await tokenStorage.getAccessToken();
@@ -29,21 +41,79 @@ class ApiClient {
     return headers;
   }
 
+  Future<bool> _refreshToken() async {
+    if (_refreshFuture != null) {
+      return _refreshFuture!;
+    }
+
+    final future = tokenRefreshService.refreshAccessToken();
+
+    _refreshFuture = future;
+
+    try {
+      return await future;
+    } finally {
+      _refreshFuture = null;
+    }
+  }
+
+  Future<http.Response> _postRequest(
+    String endpoint, {
+    Map<String, dynamic>? body,
+    bool authenticated = false,
+  }) async {
+    final headers = await _buildHeaders(
+      authenticated: authenticated,
+    );
+
+    return http
+        .post(
+          Uri.parse('$baseUrl$endpoint'),
+          headers: headers,
+          body: body != null ? jsonEncode(body) : null,
+        )
+        .timeout(const Duration(seconds: 20));
+  }
+
+  Future<http.Response> _getRequest(
+    String endpoint, {
+    bool authenticated = false,
+  }) async {
+    final headers = await _buildHeaders(
+      authenticated: authenticated,
+    );
+
+    return http
+        .get(
+          Uri.parse('$baseUrl$endpoint'),
+          headers: headers,
+        )
+        .timeout(const Duration(seconds: 20));
+  }
+
   Future<http.Response> post(
     String endpoint, {
     Map<String, dynamic>? body,
     bool authenticated = false,
   }) async {
     try {
-      final headers = await _buildHeaders(authenticated: authenticated);
+      var response = await _postRequest(
+        endpoint,
+        body: body,
+        authenticated: authenticated,
+      );
 
-      final response = await http
-          .post(
-            Uri.parse('$baseUrl$endpoint'),
-            headers: headers,
-            body: body != null ? jsonEncode(body) : null,
-          )
-          .timeout(const Duration(seconds: 20));
+      if (authenticated && response.statusCode == 401) {
+        final refreshed = await _refreshToken();
+
+        if (refreshed) {
+          response = await _postRequest(
+            endpoint,
+            body: body,
+            authenticated: true,
+          );
+        }
+      }
 
       return response;
     } on SocketException {
@@ -62,7 +132,9 @@ class ApiClient {
         'Please try again later.',
       );
     } on FormatException {
-      throw NetworkException('Invalid server address.');
+      throw NetworkException(
+        'Invalid server address.',
+      );
     }
   }
 
@@ -71,11 +143,21 @@ class ApiClient {
     bool authenticated = false,
   }) async {
     try {
-      final headers = await _buildHeaders(authenticated: authenticated);
+      var response = await _getRequest(
+        endpoint,
+        authenticated: authenticated,
+      );
 
-      final response = await http
-          .get(Uri.parse('$baseUrl$endpoint'), headers: headers)
-          .timeout(const Duration(seconds: 20));
+      if (authenticated && response.statusCode == 401) {
+        final refreshed = await _refreshToken();
+
+        if (refreshed) {
+          response = await _getRequest(
+            endpoint,
+            authenticated: true,
+          );
+        }
+      }
 
       return response;
     } on SocketException {
@@ -94,7 +176,9 @@ class ApiClient {
         'Please try again later.',
       );
     } on FormatException {
-      throw NetworkException('Invalid server address.');
+      throw NetworkException(
+        'Invalid server address.',
+      );
     }
   }
 }
