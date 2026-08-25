@@ -11,17 +11,17 @@ import '../services/token_storage.dart';
 class ApiClient {
   final String baseUrl;
   final TokenStorage tokenStorage;
-  final TokenRefreshService tokenRefreshService;
-
-  Future<bool>? _refreshFuture;
+  late final TokenRefreshService tokenRefreshService;
 
   ApiClient({
     required this.baseUrl,
     required this.tokenStorage,
-  }) : tokenRefreshService = TokenRefreshService(
-          baseUrl: baseUrl,
-          tokenStorage: tokenStorage,
-        );
+  }) {
+    tokenRefreshService = TokenRefreshService(
+      baseUrl: baseUrl,
+      tokenStorage: tokenStorage,
+    );
+  }
 
   Future<Map<String, String>> _buildHeaders({
     bool authenticated = false,
@@ -41,23 +41,7 @@ class ApiClient {
     return headers;
   }
 
-  Future<bool> _refreshToken() async {
-    if (_refreshFuture != null) {
-      return _refreshFuture!;
-    }
-
-    final future = tokenRefreshService.refreshAccessToken();
-
-    _refreshFuture = future;
-
-    try {
-      return await future;
-    } finally {
-      _refreshFuture = null;
-    }
-  }
-
-  Future<http.Response> _postRequest(
+  Future<http.Response> _sendPost(
     String endpoint, {
     Map<String, dynamic>? body,
     bool authenticated = false,
@@ -75,7 +59,7 @@ class ApiClient {
         .timeout(const Duration(seconds: 20));
   }
 
-  Future<http.Response> _getRequest(
+  Future<http.Response> _sendGet(
     String endpoint, {
     bool authenticated = false,
   }) async {
@@ -97,17 +81,18 @@ class ApiClient {
     bool authenticated = false,
   }) async {
     try {
-      var response = await _postRequest(
+      var response = await _sendPost(
         endpoint,
         body: body,
         authenticated: authenticated,
       );
 
       if (authenticated && response.statusCode == 401) {
-        final refreshed = await _refreshToken();
+        final refreshed =
+            await tokenRefreshService.refreshAccessToken();
 
         if (refreshed) {
-          response = await _postRequest(
+          response = await _sendPost(
             endpoint,
             body: body,
             authenticated: true,
@@ -143,16 +128,17 @@ class ApiClient {
     bool authenticated = false,
   }) async {
     try {
-      var response = await _getRequest(
+      var response = await _sendGet(
         endpoint,
         authenticated: authenticated,
       );
 
       if (authenticated && response.statusCode == 401) {
-        final refreshed = await _refreshToken();
+        final refreshed =
+            await tokenRefreshService.refreshAccessToken();
 
         if (refreshed) {
-          response = await _getRequest(
+          response = await _sendGet(
             endpoint,
             authenticated: true,
           );
