@@ -7,19 +7,25 @@ import 'package:http/http.dart' as http;
 import '../exceptions/network_exception.dart';
 import '../services/token_refresh_service.dart';
 import '../services/token_storage.dart';
+import '../services/auth_state.dart';
 
 class ApiClient {
   final String baseUrl;
   final TokenStorage tokenStorage;
   late final TokenRefreshService tokenRefreshService;
+  final AuthState authState;
 
   ApiClient({
     required this.baseUrl,
     required this.tokenStorage,
+    required this.authState,
+
   }) {
     tokenRefreshService = TokenRefreshService(
       baseUrl: baseUrl,
       tokenStorage: tokenStorage,
+      authState: authState,
+      
     );
   }
 

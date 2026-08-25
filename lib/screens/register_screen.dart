@@ -8,9 +8,12 @@ import '../widgets/auth/auth_button.dart';
 import '../api/api_client.dart';
 import '../services/auth_service.dart';
 import '../services/token_storage_provider.dart';
+import '../services/auth_state.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  final AuthState authState;
+
+  const RegisterScreen({super.key, required this.authState});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -24,10 +27,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   late final _tokenStorage = createTokenStorage();
   late final _authService = AuthService(
     apiClient: ApiClient(
-      baseUrl: 'http://testtesttest', //Placeholder
+      baseUrl: 'http://testtesttest',
       tokenStorage: _tokenStorage,
+      authState: widget.authState,
     ),
     tokenStorage: _tokenStorage,
+    authState: widget.authState,
   );
 
   @override
@@ -68,8 +73,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
 
     await _authService.register(
-    email: _emailController.text.trim(),
-    password: _passwordController.text,
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
     );
   }
 
@@ -78,7 +83,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       body: Stack(
         children: [
-
           const AuthBackground(),
 
           AuthSafeArea(
@@ -88,7 +92,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-
                     const Text(
                       "Create Your Account",
                       style: TextStyle(
@@ -119,10 +122,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     const SizedBox(height: 10),
 
-                    AuthButton(
-                      buttonText: "Sign up",
-                       onPressed: register,
-                       ),
+                    AuthButton(buttonText: "Sign up", onPressed: register),
 
                     const SizedBox(height: 20),
 

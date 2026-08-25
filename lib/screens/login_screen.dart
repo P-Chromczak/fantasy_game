@@ -11,9 +11,12 @@ import '../api/api_client.dart';
 import '../services/auth_service.dart';
 import 'register_screen.dart';
 import '../services/token_storage_provider.dart';
+import '../services/auth_state.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final AuthState authState;
+
+  const LoginScreen({super.key, required this.authState});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -26,10 +29,12 @@ class _LoginScreenState extends State<LoginScreen> {
   late final _tokenStorage = createTokenStorage();
   late final _authService = AuthService(
     apiClient: ApiClient(
-      baseUrl: 'http://testtesttest', //Placeholder
+      baseUrl: 'http://testtesttest',
       tokenStorage: _tokenStorage,
+      authState: widget.authState,
     ),
     tokenStorage: _tokenStorage,
+    authState: widget.authState,
   );
 
   @override
@@ -125,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     AuthButton(
                       buttonText: "Log in",
-                      onPressed: login
+                       onPressed: login,
                     ),
 
                     const SizedBox(height: 30),
@@ -171,7 +176,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const RegisterScreen(),
+                            builder: (context) => RegisterScreen(
+                              authState: widget.authState,
+                            ),
                           ),
                         );
                       },

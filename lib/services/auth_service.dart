@@ -1,13 +1,19 @@
 import 'dart:convert';
 
 import '../api/api_client.dart';
+import 'auth_state.dart';
 import 'token_storage.dart';
 
 class AuthService {
   final ApiClient apiClient;
   final TokenStorage tokenStorage;
+  final AuthState authState;
 
-  AuthService({required this.apiClient, required this.tokenStorage});
+  AuthService({
+    required this.apiClient,
+    required this.tokenStorage,
+    required this.authState,
+  });
 
   Future<void> login({
     required String username,
@@ -15,7 +21,10 @@ class AuthService {
   }) async {
     final response = await apiClient.post(
       '/api/token/pair',
-      body: {'username': username, 'password': password},
+      body: {
+        'username': username,
+        'password': password,
+      },
     );
 
     if (response.statusCode != 200) {
@@ -28,6 +37,8 @@ class AuthService {
       accessToken: data['access'],
       refreshToken: data['refresh'],
     );
+
+    authState.setAuthenticated();
   }
 
   Future<void> register({
@@ -36,7 +47,10 @@ class AuthService {
   }) async {
     final response = await apiClient.post(
       '/api/users/register',
-      body: {'email': email, 'password': password},
+      body: {
+        'email': email,
+        'password': password,
+      },
     );
 
     if (response.statusCode != 201) {
@@ -49,9 +63,12 @@ class AuthService {
       accessToken: data['access'],
       refreshToken: data['refresh'],
     );
+
+    authState.setAuthenticated();
   }
 
   Future<void> logout() async {
     await tokenStorage.clearTokens();
+    authState.setUnauthenticated();
   }
 }

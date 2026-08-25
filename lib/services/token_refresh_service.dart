@@ -4,21 +4,25 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
+import 'auth_state.dart';
 import 'token_storage.dart';
 
 class TokenRefreshService {
   final String baseUrl;
   final TokenStorage tokenStorage;
+  final AuthState authState;
 
   TokenRefreshService({
     required this.baseUrl,
     required this.tokenStorage,
+    required this.authState,
   });
 
   Future<bool> refreshAccessToken() async {
     final refreshToken = await tokenStorage.getRefreshToken();
 
     if (refreshToken == null) {
+      authState.setUnauthenticated();
       return false;
     }
 
@@ -37,6 +41,7 @@ class TokenRefreshService {
 
       if (response.statusCode != 200) {
         await tokenStorage.clearTokens();
+        authState.setUnauthenticated();
         return false;
       }
 
@@ -45,8 +50,10 @@ class TokenRefreshService {
       final newAccessToken = data['access'];
       final newRefreshToken = data['refresh'];
 
-      if (newAccessToken is! String || newRefreshToken is! String) {
+      if (newAccessToken is! String ||
+          newRefreshToken is! String) {
         await tokenStorage.clearTokens();
+        authState.setUnauthenticated();
         return false;
       }
 
@@ -54,6 +61,8 @@ class TokenRefreshService {
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
       );
+
+      authState.setAuthenticated();
 
       return true;
     } on SocketException {
